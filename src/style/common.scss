@@ -1,0 +1,27 @@
+@import './variable.scss';
+/* 常用 */
+.fl{float:left;}
+.fr{float:right;}
+.clearfix{zoom: 1;}
+.clearfix:after{content:'';display:block;clear:both;}
+
+
+.w-800{
+  width: 800px;
+  margin: 0 auto;
+}
+#root , .ant-layout{
+  height: 100%;
+}
+.topic{
+  color: $topic;
+}
+.cp{
+  cursor: pointer;
+}
+
+
+// 距离
+.mr-20{
+  margin-right: 20px;
+}
