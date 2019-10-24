@@ -1,12 +1,16 @@
 import React, { useState, useEffect }  from 'react'
 import { Table, Button, Divider, Switch, Modal, Form, Input, Row, Col, message } from 'antd'
+import { useQuery, useMutation } from '@apollo/react-hooks'
+import { 
+  CHANNEL_LIST,
+  CHANNEL_DETAIL,
+  CHANNEL_OPEN_CTRL,
+  CHANNEL_OPERATE
+} from '../api/graphType'
 import {
-  getChannelList,
-  postChannelOpenCtrl,
   postChannelDelete,
   postChannelMutiUpdate,
   postChannelAllUpdate,
-  getChannelDetail,
   postChannelAdd,
   postChannelModify
 } from '../api/mock'
@@ -34,69 +38,73 @@ const formItem = {
 }
 
 const Channel: React.FC = (props: any) => {
-  // 列表
+  // 列表分页相关
   const [list, setList] = useState([])
-
-  // 分页
   const [pageCurrent, setPageCurrent] = useState(1)
   const [total, setTotal] = useState(0)
-  
+  const { loading: channelListLoading, refetch: getChannelList } = useQuery(CHANNEL_LIST)
+
+  const getList = async () => {
+    let res = await getChannelList({
+      pageSize,
+      current: pageCurrent
+    })
+    const { total, list } = res.data.channelList
+    const nList = JSON.parse(JSON.stringify(list))
+    nList.forEach((el: any) => {
+      el.key = el.id
+      el.loading = false
+    })
+    setList(nList)
+    setTotal(total)
+  }
   const chgPage = (pageInfo: any) => {
-    console.log(pageInfo)
     setPageCurrent(pageInfo.current)
   }
-
-  // 获取列表
-  const getList = () => {
-    let data = {
-      current: pageCurrent,
-      pageSize
-    }
-    console.log('查询', data)
-    getChannelList(data).then(res => {
-      let resData = res.data
-      resData.list.forEach((el: any) => {
-        el.loading = false
-      })
-      setList(resData.list)
-      setTotal(resData.total)
-    }).catch(err => {
-      console.log(err)
-    })
-  }
-
   useEffect(() => {
-    // setFieldsValue(form)
     getList()
   }, [pageCurrent])
 
   // 开关
-  const chgOpen = (index: number, status: boolean) => {
+  const [chgChannelOpenCtrl] = useMutation(CHANNEL_OPEN_CTRL)
+  const chgOpen = async (item: any, index: number) => {
     if (!openOk) {
       return
     }
     openOk = false
 
-    let listNew = JSON.parse(JSON.stringify(list))
-    listNew[index].loading = true
-    setList(listNew)
-
-    postChannelOpenCtrl({
-      status
-    }).then(() => {
-      let listNew = JSON.parse(JSON.stringify(list))
-      listNew[index].isOpen = status ? 1 : 0
-      listNew[index].loading = false
-      setList(listNew)
-      openOk = true
-      message.success('修改成功')
-    }).catch(err => {
-      let listNew = JSON.parse(JSON.stringify(list))
-      listNew[index].loading = false
-      setList(listNew)
-      openOk = true
-      console.log(err)
+    setList((list: any) => {
+      let nList = list.map((el: any, i: number) => {
+        if (i === index) {
+          el.loading = true
+        }
+        return el
+      })
+      return nList
     })
+
+    let res = await chgChannelOpenCtrl({
+      variables: {
+        id: item.id,
+        isOpen: item.isOpen === 1 ? 0 : 1
+      }
+    })
+
+    const { id, isOpen } = res.data.channelOpenCtrl
+    console.log(id, isOpen)
+    setList((list: any) => {
+      let nList = list.map((el: any) => {
+        if (el.id === id) {
+          el.loading = false
+          el.isOpen = isOpen
+        }
+        return el
+      })
+      return nList
+    })
+
+    openOk = true
+    message.success('修改成功')
   }
 
   // 删除单个
@@ -155,124 +163,148 @@ const Channel: React.FC = (props: any) => {
     })
   }
 
-  // 打开新增
-  const openNewDialog = () => {
-    setForm(JSON.parse(JSON.stringify(formItem)))
-    setIsModify(false)
-    setShowDialog(true)
-  }
-
-  // 弹窗
+  // 展示详情表单
   const [showDialog, setShowDialog] = useState(false)
-
-  // 展示详情
-  const showDetail = (item: any) => {
-    getChannelDetail({
+  const [isModify, setIsModify] = useState(false)
+  const [modifyId, setModifyId] = useState(undefined)
+  const [form, setForm] = useState(JSON.parse(JSON.stringify(formItem)))
+  const { getFieldDecorator } = props.form
+  const { refetch: getChannelDetail } = useQuery(CHANNEL_DETAIL)
+  const [chgChannelOperate, { data: channelOperateData }] = useMutation(CHANNEL_OPERATE)
+  
+  const showDetail = async (item: any) => {
+    let res = await getChannelDetail({
       id: item.id
-    }).then(res => {
-      let resData = res.data
-      let form = dealDataToForm(resData)
-      console.log(form)
-      setForm(form)
-      setIsModify(true)
-      setShowDialog(true)
-    }).catch(err => {
-      console.log(err)
     })
+    updateForm(false, res.data.channelDetail)
   }
   const dealDataToForm = (resData: any) => {
     let data = JSON.parse(JSON.stringify(resData))
     data.isOpen = !!resData.isOpen
     data.isSpa = !!resData.isSpa
-    data.isSpa = !!resData.isSpa
+    data.isUseUserAgent = !!resData.isUseUserAgent
+    console.log('获取数据', data)
+    setModifyId(data.id)
     return data
   }
-  
-  // 表单
-  const [isModify, setIsModify] = useState(false)
-  const [form, setForm] = useState(JSON.parse(JSON.stringify(formItem)))
-  const { getFieldDecorator } = props.form
   const validateForm = () => {
-    if (!submitOk) {
-      return
-    }
-    submitOk = false
+    
     props.form.validateFields((err: any, values: any) => {
       if (!err) {
         console.log(values)
+        if (!submitOk) {
+          return
+        }
+        submitOk = false
         isModify ? submitFormModify(values) : submitFormAdd(values)
       }
     })
   }
-  const dealForm = (values: object) => {
-    return values
+  const dealForm = (form: any) => {
+    const data = JSON.parse(JSON.stringify(form))
+    data.isOpen = form.isOpen ? 1 : 0
+    data.isUseUserAgent = form.isUseUserAgent ? 1 : 0
+    data.isSpa = form.isSpa ? 1 : 0
+    console.log('提交转换', data)
+    if (isModify) {
+      data.id = modifyId
+    }
+    return data
   }
   const submitFormAdd = (values: object) => {
     let data = dealForm(values)
-    postChannelAdd(data).then(res => {
-      message.success('新增成功')
-      setShowDialog(false)
-      submitOk = true
-    }).catch(err => {
-      submitOk = true
-      console.log(err)
+    console.log(data)
+    chgChannelOperate({
+      variables: {
+        form: data,
+        type: 'add'
+      }
     })
   }
-  const submitFormModify = (values: object) => {
-    let data = dealForm(values)
-    postChannelModify(data).then(res => {
-      message.success('修改成功')
+  useEffect(() => {
+    if (channelOperateData && channelOperateData.channelOperate) {
+      message.success( isModify ? '修改成功' : '新增成功')
+      console.log('ok', channelOperateData)
       setShowDialog(false)
       submitOk = true
-    }).catch(err => {
-      submitOk = true
-      console.log(err)
+      getList()
+    }
+  }, [channelOperateData])
+  const submitFormModify = (values: object) => {
+    let data = dealForm(values)
+    chgChannelOperate({
+      variables: {
+        form: data,
+        type: 'modify'
+      }
     })
   }
 
+  const updateForm = (isNew: boolean, data?: any) => {
+    if (isNew) {
+      setForm(JSON.parse(JSON.stringify(formItem)))
+      setIsModify(false)
+      setShowDialog(true)
+    } else {
+      setForm(dealDataToForm(data))
+      setIsModify(true)
+      setShowDialog(true)
+    }
+  }
+
   return (
-    <div>
-      <div className="clearfix">
-        <Button onClick={allUpdate} loading={allUpdateLoading} className="fl mr-20" type="primary">全部更新</Button>
-        <Button onClick={mutiUpdate} loading={mutiUpdateLoading} disabled={selectedRow.length === 0} className="fl" type="primary">批量更新</Button>
-        <Button onClick={openNewDialog} className="fr" type="primary">新增</Button>
+    <div className="cm-flex-column" style={{
+      height: '100%'
+    }}>
+      <div>
+        <div className="clearfix">
+          <Button onClick={allUpdate} loading={allUpdateLoading} className="fl mr-20" type="primary">全部更新</Button>
+          <Button onClick={mutiUpdate} loading={mutiUpdateLoading} disabled={selectedRow.length === 0} className="fl" type="primary">批量更新</Button>
+          <Button onClick={() => { updateForm(true) }} className="fr" type="primary">新增</Button>
+        </div>
+        <Divider />
       </div>
-      <Divider />
       {/* 列表 */}
-      <Table 
-        onChange={chgPage}
-        rowSelection={rowSelection} 
-        dataSource={list} 
-        pagination={{
-          current: pageCurrent,
-          pageSize,
-          total
+      <div 
+        className="cm-flex-1" style={{
+          overflow: 'auto'
         }}>
-        <Column title="id" dataIndex="id" key="id" />
-        <Column title="名称" dataIndex="name" key="name" />
-        <Column title="排序" dataIndex="sort" key="sort" />
-        <Column
-          title="状态"
-          dataIndex="isOpen"
-          key="isOpen"
-          render={(isOpen, item: any, index) => {
-            return (
-              <Switch onChange={(status) => {chgOpen(index, status)}} loading={item.loading} checkedChildren="开" unCheckedChildren="关" checked={isOpen === 1} />
-            )
-          }}
-        />
-        <Column
-          title="操作"
-          dataIndex="id"
-          key="actions"
-          render={(id, item: any) => (
-            <div className="clearfix">
-              <span onClick={() => {showDetail(item)}} className="fl cp topic mr-20">详情</span>
-              <span onClick={() => {deleteChannel(item)}} className="fl cp topic">删除</span>
-            </div>
-          )}
-        />
-      </Table>
+        <Table 
+          loading={channelListLoading}
+          onChange={chgPage}
+          rowSelection={rowSelection} 
+          dataSource={list} 
+          pagination={{
+            current: pageCurrent,
+            pageSize,
+            total
+          }}>
+          <Column title="id" dataIndex="id" key="id" />
+          <Column title="名称" dataIndex="name" key="name" />
+          <Column title="排序" dataIndex="sort" key="sort" />
+          <Column
+            title="状态"
+            dataIndex="isOpen"
+            key="isOpen"
+            render={(isOpen, item: any, index) => {
+              return (
+                <Switch onChange={() => {chgOpen(item, index)}} loading={item.loading} checkedChildren="开" unCheckedChildren="关" checked={isOpen === 1} />
+              )
+            }}
+          />
+          <Column
+            title="操作"
+            dataIndex="id"
+            key="actions"
+            render={(id, item: any) => (
+              <div className="clearfix">
+                <span onClick={() => {showDetail(item)}} className="fl cp topic mr-20">详情</span>
+                <span onClick={() => {deleteChannel(item)}} className="fl cp topic">删除</span>
+              </div>
+            )}
+          />
+        </Table>
+      </div>
       {/* 弹出框 */}
       <Modal
         title={isModify ? '修改' : '新增'}
@@ -479,7 +511,6 @@ const Channel: React.FC = (props: any) => {
             </Col>
           </Row>
         </Form>
-
       </Modal>
     </div>
   )

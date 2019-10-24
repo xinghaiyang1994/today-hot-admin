@@ -5,6 +5,20 @@
 .clearfix{zoom: 1;}
 .clearfix:after{content:'';display:block;clear:both;}
 
+// flex
+.cm-flex{
+  display: flex;
+}
+.cm-flex-wrap{
+  flex-wrap: wrap;
+}
+.cm-flex-column{
+  display: flex;
+  flex-direction: column;
+}
+.cm-flex-1{
+  flex: 1;
+}
 
 .w-800{
   width: 800px;

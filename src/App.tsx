@@ -77,7 +77,7 @@ const App: React.FC = (props: any) => {
               marginTop: 20,
               minHeight: 280,
             }}>
-            <div>{renderRoutes(routes)}</div>
+            {renderRoutes(routes)}
           </Content>
         </Layout>
       </Layout>
