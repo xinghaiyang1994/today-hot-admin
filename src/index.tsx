@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { lazy, Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router } from 'react-router-dom'
 import zhCN from 'antd/es/locale/zh_CN'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, Skeleton } from 'antd'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from '@apollo/react-hooks'
-import App from './App'
 import * as serviceWorker from './serviceWorker'
 import './style/common.scss' 
 import './style/style.scss' 
 
+const App = lazy(() => import('./App'))
 const client = new ApolloClient({
   uri: 'http://localhost:3100/graphql'
 })
@@ -18,7 +18,9 @@ ReactDOM.render(
   <Router>
     <ApolloProvider client={client}>
       <ConfigProvider locale={zhCN}>
-        <App />
+        <Suspense fallback={ <Skeleton active /> }>
+          <App />
+        </Suspense>
       </ConfigProvider>
     </ApolloProvider>
   </Router>, 
