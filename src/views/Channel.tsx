@@ -10,7 +10,7 @@ import {
   postChannelAdd,
   postChannelModify
 } from '../api/mock'
-
+ 
 const { Column } = Table
 
 const pageSize = 10
