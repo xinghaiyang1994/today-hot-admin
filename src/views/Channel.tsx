@@ -2,14 +2,13 @@ import React, { useState, useEffect }  from 'react'
 import { Table, Button, Divider, Switch, Modal, Form, Input, Row, Col, message } from 'antd'
 import {
   getChannelList,
+  getChannelDetail,
+  postChannelAdd,
+  postChannelModify,
   postChannelOpenCtrl,
   postChannelDelete,
   postChannelMutiUpdate,
-  postChannelAllUpdate,
-  getChannelDetail,
-  postChannelAdd,
-  postChannelModify
-} from '../api/mock'
+} from '../api/actions'
  
 const { Column } = Table
 
@@ -49,16 +48,24 @@ const Channel: React.FC = (props: any) => {
   // 获取列表
   const getList = () => {
     let data = {
-      current: pageCurrent,
+      page: pageCurrent,
       pageSize
     }
     console.log('查询', data)
     getChannelList(data).then(res => {
       let resData = res.data
-      resData.list.forEach((el: any) => {
+      const list = resData.list
+
+      // 非第一个页删除最后一个元素
+      if (list.length === 0 && pageCurrent > 1) {
+        return setPageCurrent(pageCurrent - 1)
+      } 
+
+      list.forEach((el: any) => {
+        el.key = el.id
         el.loading = false
       })
-      setList(resData.list)
+      setList(list)
       setTotal(resData.total)
     }).catch(err => {
       console.log(err)
@@ -66,34 +73,53 @@ const Channel: React.FC = (props: any) => {
   }
 
   useEffect(() => {
-    // setFieldsValue(form)
     getList()
   }, [pageCurrent])
 
   // 开关
-  const chgOpen = (index: number, status: boolean) => {
+  const chgOpen = (status: boolean, item: any, index: number) => {
     if (!openOk) {
       return
     }
     openOk = false
 
-    let listNew = JSON.parse(JSON.stringify(list))
-    listNew[index].loading = true
-    setList(listNew)
+    setList((list: any) => {
+      const nList = list.map((el: any, i: number) => {
+        if (i === index) {
+          el.loading = true
+        }
+        return el
+      })
+      return nList
+    })
 
     postChannelOpenCtrl({
-      status
+      id: item.id,
+      isOpen: status ? 1 : 0
     }).then(() => {
-      let listNew = JSON.parse(JSON.stringify(list))
-      listNew[index].isOpen = status ? 1 : 0
-      listNew[index].loading = false
-      setList(listNew)
+      setList((list: any) => {
+        const nList = list.map((el: any, i: number) => {
+          if (i === index) {
+            el.loading = false
+            el.isOpen = status ? 1 : 0
+          }
+          return el
+        })
+        return nList
+      })
+
       openOk = true
       message.success('修改成功')
     }).catch(err => {
-      let listNew = JSON.parse(JSON.stringify(list))
-      listNew[index].loading = false
-      setList(listNew)
+      setList((list: any) => {
+        const nList = list.map((el: any, i: number) => {
+          if (i === index) {
+            el.loading = false
+          }
+          return el
+        })
+        return nList
+      })
       openOk = true
       console.log(err)
     })
@@ -109,12 +135,13 @@ const Channel: React.FC = (props: any) => {
         return postChannelDelete({
           id: item.id
         }).then(() => {
+          getList()
           message.success('删除成功')
         }).catch(err => {
           console.log(err)
         })
       },
-      onCancel() {},
+      onCancel() {}
     })
   }
 
@@ -132,10 +159,11 @@ const Channel: React.FC = (props: any) => {
     setMutiUpdateLoading(true)
     console.log(selectedRow)
     postChannelMutiUpdate({
+      type: 'muti',
       list: selectedRow
-    }).then(() => {
+    }).then((res: any) => {
       setMutiUpdateLoading(false)
-      message.success('批量更新成功')
+      message.success(res.message)
     }).catch(err => {
       setMutiUpdateLoading(false)
       console.log(err)
@@ -146,9 +174,11 @@ const Channel: React.FC = (props: any) => {
   const [allUpdateLoading, setAllUpdateLoading] = useState(false)
   const allUpdate = () => {
     setAllUpdateLoading(true)
-    postChannelAllUpdate().then(() => {
+    postChannelMutiUpdate({
+      type: 'all'
+    }).then((res: any) => {
       setAllUpdateLoading(false)
-      message.success('全部更新成功')
+      message.success(res.message)
     }).catch(err => {
       setAllUpdateLoading(false)
       console.log(err)
@@ -174,6 +204,7 @@ const Channel: React.FC = (props: any) => {
       let form = dealDataToForm(resData)
       console.log(form)
       setForm(form)
+      setModifyId(form.id)
       setIsModify(true)
       setShowDialog(true)
     }).catch(err => {
@@ -184,12 +215,13 @@ const Channel: React.FC = (props: any) => {
     let data = JSON.parse(JSON.stringify(resData))
     data.isOpen = !!resData.isOpen
     data.isSpa = !!resData.isSpa
-    data.isSpa = !!resData.isSpa
+    data.isUseUserAgent = !!resData.isUseUserAgent
     return data
   }
   
   // 表单
   const [isModify, setIsModify] = useState(false)
+  const [modifyId, setModifyId] = useState('')
   const [form, setForm] = useState(JSON.parse(JSON.stringify(formItem)))
   const { getFieldDecorator } = props.form
   const validateForm = () => {
@@ -205,13 +237,18 @@ const Channel: React.FC = (props: any) => {
     })
   }
   const dealForm = (values: object) => {
-    return values
+    let data = JSON.parse(JSON.stringify(values))
+    if (isModify) {
+      data.id = modifyId
+    }
+    return data
   }
   const submitFormAdd = (values: object) => {
     let data = dealForm(values)
     postChannelAdd(data).then(res => {
       message.success('新增成功')
       setShowDialog(false)
+      getList()
       submitOk = true
     }).catch(err => {
       submitOk = true
@@ -223,6 +260,7 @@ const Channel: React.FC = (props: any) => {
     postChannelModify(data).then(res => {
       message.success('修改成功')
       setShowDialog(false)
+      getList()
       submitOk = true
     }).catch(err => {
       submitOk = true
@@ -257,7 +295,7 @@ const Channel: React.FC = (props: any) => {
           key="isOpen"
           render={(isOpen, item: any, index) => {
             return (
-              <Switch onChange={(status) => {chgOpen(index, status)}} loading={item.loading} checkedChildren="开" unCheckedChildren="关" checked={isOpen === 1} />
+              <Switch onChange={(status) => {chgOpen(status, item, index)}} loading={item.loading} checkedChildren="开" unCheckedChildren="关" checked={isOpen === 1} />
             )
           }}
         />

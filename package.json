@@ -15,6 +15,7 @@
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
+    "sea-axios": "^2.0.0",
     "styled-components": "^4.4.0",
     "typescript": "3.6.4"
   },
