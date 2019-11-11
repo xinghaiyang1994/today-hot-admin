@@ -11,7 +11,7 @@ const ajax = ajaxInit({
     }
     // 处理 url 中 code 有问题的情况
     if (res.data.code === -2) {
-      
+      return window.location.href = `${API.USER_LOGIN}?from=${encodeURIComponent(window.location.href)}`
     }
     // code 非 0 统一处理
     if (res.data.code !== 0) {

@@ -3,15 +3,18 @@ const CURRENT_ENV = 'dev'
 const URL = {
   // 本地环境
   dev: {
-    BUSINESS: '//local.xinghaiyang.com:3100'
+    BUSINESS: '//local.xinghaiyang.com:3100',
+    PASSPORT: '//local.xinghaiyang.com:8080'
   }, 
   // 测试环境
   test: {
-    BUSINESS: '//local.xinghaiyang.com:3100'
+    BUSINESS: '//local.xinghaiyang.com:3100',
+    PASSPORT: '//local.xinghaiyang.com:8080'
   },
   // 正式环境
   prod: {
-    BUSINESS: ''
+    BUSINESS: '',
+    PASSPORT: '//passport-api.xinghaiyang.com'
   }
 }
 const DOMAIN = URL[CURRENT_ENV]
@@ -19,6 +22,7 @@ const DOMAIN = URL[CURRENT_ENV]
 const API = {
   // 用户
   USER_INFO: DOMAIN.BUSINESS + '/user/info',   // 登录用户信息
+  USER_LOGIN: DOMAIN.PASSPORT + '/login',   // 登录
   USER_LOGOUT: DOMAIN.BUSINESS + '/user/logout',   // 退出
 
   // 渠道

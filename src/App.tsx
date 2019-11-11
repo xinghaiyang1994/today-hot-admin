@@ -3,6 +3,7 @@ import { Layout, Menu, Icon, Dropdown, message } from 'antd'
 import { renderRoutes } from 'react-router-config'
 import { Link, withRouter } from 'react-router-dom'
 import routes from './router' 
+import API from './api/index' 
 import { getUserInfo, postUserLogout } from './api/actions'
 
 const { Header, Content, Sider } = Layout
@@ -52,6 +53,7 @@ const App: React.FC = (props: any) => {
       console.log(res)
       message.success('退出成功')
       setInfo(JSON.parse(JSON.stringify(infoItem)))
+      window.location.href = `${API.USER_LOGIN}?from=${encodeURIComponent(window.location.href)}`
     }).catch(err => {
       console.log(err)
     })
