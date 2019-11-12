@@ -2,7 +2,6 @@ import ajaxInit from 'sea-axios'
 import API from './index'
 import { message } from 'antd'
 
-
 const ajax = ajaxInit({
   initTransformResponseFn(res: any) {
     // 网络错误统一处理

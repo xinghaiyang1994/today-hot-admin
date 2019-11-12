@@ -4,6 +4,8 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import zhCN from 'antd/es/locale/zh_CN'
 import { ConfigProvider, Skeleton } from 'antd'
 import * as serviceWorker from './serviceWorker'
+import { Provider } from 'react-redux'
+import store from './store'
 import './style/common.scss' 
 import './style/style.scss' 
 
@@ -13,7 +15,9 @@ ReactDOM.render(
   <Router>
     <ConfigProvider locale={zhCN}>
       <Suspense fallback={ <Skeleton active /> }>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </Suspense>
     </ConfigProvider>
   </Router>, 

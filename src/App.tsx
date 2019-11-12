@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Icon, Dropdown, message } from 'antd'
 import { renderRoutes } from 'react-router-config'
 import { Link, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import routes from './router' 
 import API from './api/index' 
-import { getUserInfo, postUserLogout } from './api/actions'
+import { postUserLogout } from './api/actions'
+import { getInfo, chgInfo } from './store/action'
 
 const { Header, Content, Sider } = Layout
 
@@ -33,18 +35,11 @@ const infoItem: Info = {
 }
 
 const App: React.FC = (props: any) => {
-  const { location } = props
+  const { location, dispatch, info } = props
 
   // 获取信息
-  const [info, setInfo] = useState(JSON.parse(JSON.stringify(infoItem)))
   useEffect(() => {
-    getUserInfo().then(res => {
-      console.log(res)
-      let resData = res.data
-      setInfo(resData)
-    }).catch(err => {
-      console.log(err)
-    })
+    dispatch(getInfo())
   }, [])
 
   // 退出
@@ -52,7 +47,7 @@ const App: React.FC = (props: any) => {
     postUserLogout().then(res => {
       console.log(res)
       message.success('退出成功')
-      setInfo(JSON.parse(JSON.stringify(infoItem)))
+      dispatch(chgInfo(JSON.parse(JSON.stringify(infoItem))))
       window.location.href = `${API.USER_LOGIN}?from=${encodeURIComponent(window.location.href)}`
     }).catch(err => {
       console.log(err)
@@ -128,4 +123,7 @@ const App: React.FC = (props: any) => {
   )
 }
 
-export default withRouter(App)
+const mapStateToProps = (state: any) => ({
+  info: state.reducerInfo
+})
+export default connect(mapStateToProps)(withRouter(App))

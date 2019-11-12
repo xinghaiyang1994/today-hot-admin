@@ -1,5 +1,5 @@
 import Config from '../views/Config'
-import Channel from '../views/Channel'
+import Channel from '../views/channel/Index'
 
 const routes = [
   {
