@@ -34,6 +34,10 @@ const API = {
   CHANNEL_DELETE: DOMAIN.BUSINESS + '/channel/delete',   // 删除单个渠道
   CHANNEL_MUTI_UPDATE: DOMAIN.BUSINESS + '/channel/mutiUpdate',   // 多个渠道重新抓取
   
+  // 配置
+  CONFIG_ALL: DOMAIN.BUSINESS + '/config/all',   // 所有配置列表
+  CONFIG_ALL_MODIFY: DOMAIN.BUSINESS + '/config/modify',   // 修改所有配置列表
+
 }
 
 export default API

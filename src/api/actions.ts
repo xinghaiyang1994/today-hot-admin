@@ -95,6 +95,22 @@ function postChannelMutiUpdate(data: any) {
   })
 }
 
+function getConfigAll() {
+  return ajax({
+    url: API.CONFIG_ALL,
+    method: 'get'
+  })
+}
+
+function postConfigAllModify(data: any) {
+  return ajax({
+    url: API.CONFIG_ALL_MODIFY,
+    method: 'post',
+    data
+  })
+}
+
+
 export {
   // 用户
   getUserInfo,
@@ -106,5 +122,8 @@ export {
   postChannelModify,
   postChannelOpenCtrl,
   postChannelDelete,
-  postChannelMutiUpdate
+  postChannelMutiUpdate,
+  // 配置
+  getConfigAll,
+  postConfigAllModify
 }
