@@ -1,5 +1,6 @@
 import Config from '../views/Config'
 import Channel from '../views/channel/Index'
+import Fail from '../views/fail/Index'
 
 const routes = [
   {
@@ -10,6 +11,10 @@ const routes = [
   {
     path: '/config',
     component: Config
+  },
+  {
+    path: '/fail',
+    component: Fail
   }
 ]
 

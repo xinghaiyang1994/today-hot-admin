@@ -10,7 +10,7 @@ const Head = lazy(() => import('./Head'))
 const List = lazy(() => import('./List'))
 const Alert = lazy(() => import('./Alert'))
 
-const pageSize = 10
+const pageSize: number = 10
 let openOk: boolean = true
 const formItem = {
   name: '',

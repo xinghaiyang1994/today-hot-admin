@@ -110,6 +110,20 @@ function postConfigAllModify(data: any) {
   })
 }
 
+function getFailList(data: any) {
+  return ajax({
+    url: API.FAIL_LIST,
+    method: 'get',
+    data
+  })
+}
+
+function postFailRefreshAll() {
+  return ajax({
+    url: API.FAIL_REFRESH_ALL,
+    method: 'post'
+  })
+}
 
 export {
   // 用户
@@ -123,6 +137,9 @@ export {
   postChannelOpenCtrl,
   postChannelDelete,
   postChannelMutiUpdate,
+  // 失败
+  getFailList,
+  postFailRefreshAll,
   // 配置
   getConfigAll,
   postConfigAllModify

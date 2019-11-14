@@ -23,6 +23,11 @@ const nav = [
     icon: 'database'
   },
   {
+    name: '失败',
+    path: '/fail',    // 路径
+    icon: 'file-unknown'
+  },
+  {
     name: '配置',
     path: '/config',
     icon: 'setting'
