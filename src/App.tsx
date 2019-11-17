@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Layout, Menu, Icon, Dropdown, message } from 'antd'
 import { renderRoutes } from 'react-router-config'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import styles from './style/App.module.scss'
 import routes from './router' 
 import API from './api/index' 
 import { postUserLogout } from './api/actions'
@@ -70,12 +71,10 @@ const App: React.FC = (props: any) => {
   )
 
   return (
-    <Layout>
+    <Layout className="app-index">
       {/* 头部 */}
       <Header className="clearfix">
-        <div className="topic fl" style={{
-          fontSize: '24px'
-        }}>管理</div>
+        <div className={`${styles['ai-name']} topic fl`}>管理</div>
         <div className="topic fr">
           {
             info.id && (
@@ -90,11 +89,9 @@ const App: React.FC = (props: any) => {
       </Header>
       <Layout>
         {/* 侧边栏 */}
-        <Sider width={200} style={{ background: '#fff' }}>
+        <Sider width={200} className={styles['ai-side']}>
           <Menu
-            style={{
-              borderRight: 'none'
-            }}
+            className={styles['ai-menu']}
             defaultSelectedKeys={[location.pathname]}>
             {
               nav.map(el => {
@@ -111,15 +108,8 @@ const App: React.FC = (props: any) => {
           </Menu>
         </Sider>
         {/* 内容 */}
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Content
-            style={{
-              overflowY: 'auto',
-              background: '#fff',
-              padding: 24,
-              marginTop: 20,
-              minHeight: 280,
-            }}>
+        <Layout className={styles['ai-content']}>
+          <Content className={styles['ai-content-main']}>
             {renderRoutes(routes)}
           </Content>
         </Layout>

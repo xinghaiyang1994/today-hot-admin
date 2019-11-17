@@ -1,20 +1,15 @@
 // 暂时还未配置环境变量 CURRENT_ENV
-const CURRENT_ENV = 'dev'
+const CURRENT_ENV = process.env.REACT_APP_ENV as 'dev' | 'prod'
 const URL = {
   // 本地环境
   dev: {
     BUSINESS: '//local.xinghaiyang.com:3100',
     PASSPORT: '//local.xinghaiyang.com:8080'
   }, 
-  // 测试环境
-  test: {
-    BUSINESS: '//local.xinghaiyang.com:3100',
-    PASSPORT: '//local.xinghaiyang.com:8080'
-  },
   // 正式环境
   prod: {
-    BUSINESS: '',
-    PASSPORT: '//passport-api.xinghaiyang.com'
+    BUSINESS: '//fish.xinghaiyang.com',
+    PASSPORT: '//passport.xinghaiyang.com'
   }
 }
 const DOMAIN = URL[CURRENT_ENV]
@@ -44,5 +39,8 @@ const API = {
   CONFIG_ALL_MODIFY: DOMAIN.BUSINESS + '/config/modify',   // 修改所有配置列表
 
 }
+
+console.log(`环境 ${CURRENT_ENV} ,请求主域为`, DOMAIN)
+
 
 export default API

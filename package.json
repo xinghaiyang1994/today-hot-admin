@@ -8,6 +8,7 @@
     "antd": "^3.23.6",
     "babel-plugin-import": "^1.12.2",
     "customize-cra": "^0.8.0",
+    "env-cmd": "^10.0.1",
     "node-sass": "^4.12.0",
     "react": "^16.10.2",
     "react-app-rewired": "^2.1.3",
@@ -19,18 +20,16 @@
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
     "sea-axios": "^2.0.0",
-    "styled-components": "^4.4.0",
     "typescript": "3.6.4"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "dev": "env-cmd -f .env.dev react-app-rewired start",
+    "build": "env-cmd -f .env.prod react-app-rewired build"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
+  "homepage": ".",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -47,7 +46,6 @@
     "@types/node": "^12.12.7",
     "@types/react-redux": "^7.1.5",
     "@types/react-router-config": "^5.0.1",
-    "@types/react-router-dom": "^5.1.0",
-    "@types/styled-components": "^4.1.20"
+    "@types/react-router-dom": "^5.1.0"
   }
 }

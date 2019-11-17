@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Divider, Switch, message } from 'antd'
+import { Table, Button, Divider, message } from 'antd'
 import { 
   postChannelMutiUpdate,
   postFailRefreshAll,
@@ -9,7 +9,6 @@ import {
 const { Column } = Table
 
 const pageSize: number = 10
-let openOk: boolean = true
 let refreshOk: boolean = true
 
 const Fail = () => {
