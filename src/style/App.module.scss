@@ -17,3 +17,17 @@
   margin-top: 20px;
   min-height: 280px;
 }
+
+
+@media screen and (max-width: 414px) {
+  .app-index .ai-main{
+    flex-direction: column ;
+  }
+  .ai-side{
+    flex: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: auto !important;
+    margin: 0 24px;
+  }
+}

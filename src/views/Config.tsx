@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Divider, Input, message } from 'antd'
+import styles from '../style/Config.module.scss'
 import { 
   getConfigAll,
   postConfigAllModify
@@ -75,7 +76,7 @@ const Config = () => {
   }
 
   return (
-    <div>
+    <div className={styles['config']}>
       <div className="clearfix">
         <Button onClick={modifyAll} className="fr" type="primary">保存</Button>
       </div>

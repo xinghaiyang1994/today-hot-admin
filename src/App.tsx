@@ -71,7 +71,7 @@ const App: React.FC = (props: any) => {
   )
 
   return (
-    <Layout className="app-index">
+    <Layout className={styles['app-index']}>
       {/* 头部 */}
       <Header className="clearfix">
         <div className={`${styles['ai-name']} topic fl`}>管理</div>
@@ -87,7 +87,7 @@ const App: React.FC = (props: any) => {
           }
         </div>
       </Header>
-      <Layout>
+      <Layout className={styles['ai-main']}>
         {/* 侧边栏 */}
         <Sider width={200} className={styles['ai-side']}>
           <Menu
