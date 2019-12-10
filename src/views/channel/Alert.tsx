@@ -171,8 +171,8 @@ const Alert: React.FC<AlertProps> = (props: any) => {
                 initialValue: ownForm.cookie,
                 rules: [
                   {
-                    max: 1000,
-                    message: '最多 1000 个字符!',
+                    max: 2000,
+                    message: '最多 2000 个字符!',
                   }
                 ],
               })(<Input />)}
