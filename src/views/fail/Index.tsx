@@ -63,9 +63,11 @@ const Fail = () => {
     postFailRefreshAll().then((res: any) => {
       setAllUpdateLoading(false)
       message.success(res.message)
+      getList()
     }).catch(err => {
       setAllUpdateLoading(false)
       console.log(err)
+      getList()
     })
   }
 
@@ -113,6 +115,7 @@ const Fail = () => {
         return nList
       })
       refreshOk = true
+      getList()
       console.log(err)
     })
   }
